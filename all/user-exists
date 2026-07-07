@@ -1,13 +1,14 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 #
 #
-set -u -e -o pipefail
+set -u -e
 
+# doc: CMD [name] -- User 'name' exists or create it.
 new_user="$1"
 
 if getent passwd "$new_user" >/dev/null ; then
-  tell "User exists: $new_user"
+  log "User exists: $new_user"
 else
-  tell "Creating user: $new_user"
+  log "Creating user: $new_user"
 fi
 
