@@ -11,15 +11,22 @@ cd "$(dirname "$THIS_SCRIPT")"
 cd ..
 
 
-PATH="$PATH:$PWD/bins"
+ORIGIN_PATH="$PATH"
+PATH="$PATH:$PWD/base"
 
 case "$*" in
   # doc: CMD -h|--help|help -- Show this message.
-  "-h"|"--help"|"help")
+  '-h'|"--help")
     cmd="$(basename "$0")"
     grep -E '# +doc:' "$0" | sed 's/#[[:space:]]\+doc:// ; s/CMD/'${cmd}'/'
     exit 0
     ;;
+
+  # doc: CMD paths -- Prints a PATH= string to use as your new PATH.
+  paths)
+  echo "$ORIGIN_PATH:$PWD/bin:$PWD/$(get_os_name):$PWD/$(get_os_family):$PWD/base"
+  exit 0
+  ;;
 esac
 
 get_script_name() {
@@ -33,28 +40,21 @@ get_script_name() {
     return 0
   fi
 
-  if test -e "all/$1" ; then
-    echo "all/$1"
+  if test -e "base/$1" ; then
+    echo "base/$1"
     return 0
   fi
 
-  echo "!!! Script not foundu in $PWD: $1"
+  echo "!!! Script not found in $PWD: $1" >&2
   exit 2
 }
 
 target_os="$(get_os_name)"
 target_family="$(get_os_family)"
 
-case "$1" in
-  # doc: CMD user-exists [name]
-  'user-exists')
-  echo "$target_os" >&2
-  script_name="$(get_script_name "$1")"
-  "$script_name" da
-  ;;
+# echo "$target_os of $target_family" >&2
 
-  *)
-    echo "!!! Unknown command: $*" >&2
-    exit 1
-    ;;
-esac
+script_name="$(get_script_name "$1")"
+shift
+"$script_name" "$@"
+
