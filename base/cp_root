@@ -1,0 +1,37 @@
+#!/usr/bin/env zsh
+#
+#
+set -u -e -o pipefail
+
+# doc: CMD origin target
+# doc:     ignores file if content is the same.
+
+origin="$1"
+target="$2"
+
+log() {
+  echo "--- $*" >&2
+}
+
+err_exit() {
+  echo "!!! $*" >&2
+  exit 1
+}
+
+if ! test -e "$origin" ; then
+  err_exit "Not found: $origin"
+fi
+
+if test -e "$target" ; then
+  target_owner="$(stat -c '%U' "$target")"
+  if [[ "$target_owner" != 'root' ]] ; then
+    err_exit "Not owned by root: $target"
+  fi
+fi # $target exist
+
+if diff "$origin" "$target" ; then
+  log "Skipping, same: $origin -> $target"
+else
+  log "Copying files: $origin -> $target"
+  sudo cp -i "$origin" "$target"
+fi
