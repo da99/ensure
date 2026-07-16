@@ -1,6 +1,6 @@
 PrintMotd no
 
-AllowUsers {{USER}}
+AllowUsers {{ALLOWUSERS}}
 Port {{PORT}}
 
 

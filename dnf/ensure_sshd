@@ -12,7 +12,7 @@ case "$*" in
     ;;
 
   # doc: CMD -- Overwrite, unless the same, the sshd_config.
-  # doc:        Uses USER and PORT variables.
+  # doc:        Uses da_os sshd_config for config template.
   '')
   :
     ;;
@@ -26,24 +26,19 @@ esac
 
 cd "$(dirname "$0")"/..
 
-# === SETUP VARS ===
 export PATH="$PATH:$PWD/base"
-PORT="${PORT:-26}"
-# ==================
 
 tell "$PWD"
 origin=/etc/ssh/sshd_config
-custom_sshd="$PWD/config/sshd_config"
 
 tmp_file="$(mktemp)"
-sed  "s|{{USER}}|${USER}|g; s|{{PORT}}|${PORT}|g" "$custom_sshd" > "$tmp_file"
+sshd_config > "$tmp_file"
 
 tell "diff $tmp_file $origin"
 if sudo diff "$tmp_file" "$origin"  ; then
   tell "sshd_config already setup."
   exit 0
 fi
-
 
 tell "Updating sshd_config..."
 sudo mv -i "$tmp_file" "$origin"

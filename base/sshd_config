@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+#
+#
+set -u -e -o pipefail
+
+cd "$(dirname "$0")"/..
+
+# === SETUP VARS ===
+ALLOWUSERS="${ALLOWUSERS:-$USER}"
+PORT="${PORT:-26}"
+# ==================
+
+
+custom_sshd="$(select_template "$ORIGIN_DIR/config/sshd_config" "$ORIGIN_DIR/config/ssh/sshd_config" "$DA_OS_DIR/config/sshd_config")"
+
+sed  "s|{{ALLOWUSERS}}|${ALLOWUSERS}|g; s|{{PORT}}|${PORT}|g" "$custom_sshd"
