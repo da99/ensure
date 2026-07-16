@@ -6,9 +6,8 @@ set -u -e
 # doc: CMD [name] -- User 'name' exists or create it.
 new_user="$1"
 
-if getent passwd "$new_user" >/dev/null ; then
-  log "User exists: $new_user"
+if getent passwd "$new_user" >/dev/null; then
+  tell "User exists: $new_user"
 else
-  log "Creating user: $new_user"
+  tell "Creating user: $new_user"
 fi
-

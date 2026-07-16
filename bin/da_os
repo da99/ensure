@@ -7,16 +7,32 @@ THIS_SCRIPT="$0"
 
 export ORIGIN_DIR="$PWD"
 
-cd "$(dirname "$THIS_SCRIPT")"
-cd ..
-
-
+cd "$(dirname "$THIS_SCRIPT")"/..
+DA_OS_DIR="$PWD"
 ORIGIN_PATH="$PATH"
-PATH="$PATH:$PWD/base"
+
+has() {
+  command -v "$1" >/dev/null
+}
+
+SUB_PATH=""
+if has dnf ; then
+  SUB_PATH="$SUB_PATH:$DA_OS_DIR/dnf"
+fi
+
+if has xbps-install ; then
+  SUB_PATH="$SUB_PATH:$DA_OS_DIR/xbps"
+fi
+
+if has apk ; then
+  SUB_PATH="$SUB_PATH:$DA_OS_DIR/apk"
+fi
+
+SUB_PATH="$SUB_PATH:$DA_OS_DIR/base"
 
 case "$*" in
-  # doc: CMD -h|--help|help -- Show this message.
-  '-h'|"--help")
+  # doc: CMD --help -- Show this message.
+  "--help")
     cmd="$(basename "$0")"
     grep -E '# +doc:' "$0" | sed 's/#[[:space:]]\+doc:// ; s/CMD/'${cmd}'/'
     exit 0
@@ -24,7 +40,7 @@ case "$*" in
 
   # doc: CMD paths -- Prints a PATH= string to use as your new PATH.
   paths)
-  echo "$ORIGIN_PATH:$PWD/bin:$PWD/$(get_os_name):$PWD/$(get_os_family):$PWD/base"
+  echo "$SUB_PATH"
   exit 0
   ;;
 esac
@@ -49,12 +65,11 @@ get_script_name() {
   exit 2
 }
 
-target_os="$(get_os_name)"
-target_family="$(get_os_family)"
+# target_os="$(get_os_name)"
+# target_family="$(get_os_family)"
 
 # echo "$target_os of $target_family" >&2
 
-script_name="$(get_script_name "$1")"
-shift
-"$script_name" "$@"
+PATH="$PATH:$SUB_PATH"
+"$@"
 

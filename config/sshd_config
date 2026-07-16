@@ -1,0 +1,24 @@
+PrintMotd no
+
+AllowUsers {{USER}}
+Port {{PORT}}
+
+
+# ================ Disable Password Login ===========================
+UsePAM yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+# ===================================================================
+
+PermitRootLogin no
+AllowAgentForwarding no
+
+AuthorizedKeysFile	.ssh/authorized_keys
+ChallengeResponseAuthentication no
+
+Subsystem	sftp	internal-sftp
+Match Group sftpusers
+    ChrootDirectory /sftp/%u
+    ForceCommand internal-sftp
+    X11Forwarding no
+    AllowTcpForwarding no

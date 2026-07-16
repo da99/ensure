@@ -1,0 +1,70 @@
+#!/usr/bin/env zsh
+#
+#
+set -u -e -o pipefail
+
+case "$*" in
+  # doc: CMD --help -- Show this message.
+  "--help")
+    cmd="$(basename "$0")"
+    grep -E '# +doc:' "$0" | sed 's/#[[:space:]]\+doc:// ; s/CMD/'${cmd}'/'
+    exit 0
+    ;;
+
+  # doc: CMD -- Overwrite, unless the same, the sshd_config.
+  # doc:        Uses USER and PORT variables.
+  '')
+  :
+    ;;
+
+  *)
+
+    echo "!!! Unknown command: $*" >&2
+    exit 1
+    ;;
+esac
+
+cd "$(dirname "$0")"/..
+
+# === SETUP VARS ===
+export PATH="$PATH:$PWD/base"
+PORT="${PORT:-26}"
+# ==================
+
+tell "$PWD"
+origin=/etc/ssh/sshd_config
+custom_sshd="$PWD/config/sshd_config"
+
+tmp_file="$(mktemp)"
+sed  "s|{{USER}}|${USER}|g; s|{{PORT}}|${PORT}|g" "$custom_sshd" > "$tmp_file"
+
+tell "diff $tmp_file $origin"
+if sudo diff "$tmp_file" "$origin"  ; then
+  tell "sshd_config already setup."
+  exit 0
+fi
+
+
+tell "Updating sshd_config..."
+sudo mv "$tmp_file" "$origin"
+sshd -t || {
+  err_status="$?"
+    err "New sshd_config from $custom_sshd failed with $err_status"
+    exit "$err_status"
+}
+
+case "$PORT" in
+  '22') : ;;
+  *)
+    tell "Allowing $PORT to be used by sshd via SELinux..."
+    sudo semanage port -a -t ssh_port_t -p tcp "$PORT"
+    ;;
+esac
+
+tell "Restarting sshd service..."
+sudo systemctl restart sshd
+
+tell "DONE"
+
+
+#
