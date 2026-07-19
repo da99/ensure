@@ -7,7 +7,7 @@ set -u -e -o pipefail
 
 while read -r DIR; do
   cd "$DIR"
-  if test -e .git; then
+  if ! test -e .git; then
     err "Not a git repo: $DIR"
     continue
   fi
