@@ -11,5 +11,7 @@ while read -r DIR; do
     err "Not a git repo: $DIR"
     continue
   fi
+  echo
+  tell "$PWD ==="
   git pull
 done < <(find /apps/ -maxdepth 1 -mindepth 1 -type d -not -name '*+*' -and -not -name '.*')
