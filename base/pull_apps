@@ -1,0 +1,15 @@
+#!/bin/zsh
+#
+#
+set -u -e -o pipefail
+
+# doc: CMD -- Pull all repos in /apps and $HOME (if applicable.)
+
+while read -r DIR; do
+  cd "$DIR"
+  if test -e .git; then
+    err "Not a git repo: $DIR"
+    continue
+  fi
+  git pull
+done < <(find /apps/ -maxdepth 1 -mindepth 1 -type d)
