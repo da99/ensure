@@ -12,4 +12,4 @@ while read -r DIR; do
     continue
   fi
   git pull
-done < <(find /apps/ -maxdepth 1 -mindepth 1 -type d)
+done < <(find /apps/ -maxdepth 1 -mindepth 1 -type d -not -name '*+*' -and -not -name '.*')
