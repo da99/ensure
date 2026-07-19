@@ -41,6 +41,8 @@ case "$os_packager" in
     ;;
 esac
 
+DA_OS_PATH="$DA_OS_DIR/bin:$DA_OS_PATH"
+
 extract_doc() {
   grep -E '# +doc:' "$1" | sed "s/[#[:space:]]\+doc:/ / ; s/CMD/${cmd}/ ;"
 }
