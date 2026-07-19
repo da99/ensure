@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+#
+set -u -e
+
+# doc: CMD -- Upgrade packages
+
+set -x
+sudo dnf upgrade
+sudo dnf autoremove
+sudo dnf clean all
