@@ -5,4 +5,4 @@ set -u -e
 
 # doc: CMD -- Install base apps: tmux, htop, etc.
 
-sudo dnf install tmux git htop zsh
+sudo dnf install tmux git htop zsh binutils
