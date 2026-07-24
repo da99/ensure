@@ -3,11 +3,11 @@
 #
 set -u -e -o pipefail
 
-# doc: CMD MAJOR_VERSION - Using PGDG, setup postgresql.
+# doc: CMD MAJOR_VERSION|18 - Using PGDG, setup postgresql. Default: 18.
 
 pkg_name="postgresql"
 pkg_version="${1:-18}"
-pkg="${pkg_name}${pkg_version}-server"
+pkg="${pkg_name}${pkg_version}"
 
 tell "Setting up $pkg_name $pkg_version"
 if rpm -q pgdg-redhat-repo ; then
@@ -16,14 +16,14 @@ else
   arch="$(uname -m)"
   major_version="$(rpm -E %{rhel})"
   repo_url="https://download.postgresql.org/pub/repos/yum/reporpms/EL-${major_version}-${arch}/pgdg-redhat-repo-latest.noarch.rpm"
-  tell "Installing PGDG repo..."
+  tell "Installing PGDG repo: $repo_url ..."
   sudo dnf install "$repo_url"
 fi
 
-if rpm -q "$pkg" ; then
+if rpm -q "$pkg" "$pkg"-server "$pkg"-libs ; then
   tell "Already installed: $pkg"
 else
   tell "Installing ${pkg}..."
-  sudo dnf install "$pkg"
+  sudo dnf install "$pkg" "$pkg"-server "$pkg"-libs
 fi
 
