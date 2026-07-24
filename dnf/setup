@@ -5,4 +5,6 @@ set -u -e
 
 # doc: CMD -- Install base apps: tmux, htop, etc.
 
-sudo dnf install tmux git htop zsh binutils
+sudo dnf install tmux git htop zsh
+
+install_pgsql
